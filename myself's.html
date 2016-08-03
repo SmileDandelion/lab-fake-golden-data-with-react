@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<script type="text/babel">
+
+    var Input = React.createClass({
+        render(){
+            return (
+                    <div className="input-group">
+      <span className="input-group-addon">
+        <input className="Input" type="checkbox" onChange={this.props.changeA} aria-label="..."/>
+      </span>
+                        <input type="text" placeholder="please input..." className="form-control" aria-label="..."/>
+                    </div>)
+        }
+    });
+    var InputDelete = React.createClass({
+        deleteFrom(){
+            this.props.deleteFrom(this.props.index);
+        },
+        render(){
+            return (
+                    <div className="input-group">
+                        <input type="text" placeholder="please input..." className="form-control" aria-label="..."/>
+                        <span className="input-group-addon">
+        <input className="Input" type="button" value="删除" onClick={this.deleteFrom} aria-label="..."/>
+      </span>
+                    </div>)
+        }
+    });
+    var PreviewInput = React.createClass({
+        render(){
+            return (<div className="LeftPage">
+                        {
+                            this.props.forms.map((form, index)=> {
+                                return (
+                                        <div className="input-group">
+                                            <input type="text" placeholder="please input..." className="form-control" aria-label="..."/>
+                                        </div>)
+                            })
+                        }
+                    </div>
+            );
+        }
+    });
+    var Data = React.createClass({
+        render(){
+            return (
+                    <div className="input-group">
+      <span className="input-group-addon">
+        <input className="Data" type="checkbox" aria-label="..." onChange={this.props.changeB}/>
+      </span>
+                        <input type="date" className="form-control" aria-label="..."/>
+                    </div>)
+        }
+    });
+
+    var DataDelete = React.createClass({
+        deleteFrom(){
+            this.props.deleteFrom(this.props.index);
+        },
+        render(){
+            return (
+                    <div className="input-group">
+                        <input type="date" className="form-control" aria-label="..."/>
+                        <span className="input-group-addon">
+        <input className="Data" type="button" value="删除" aria-label="..." onClick={this.deleteFrom}/>
+      </span>
+                    </div>)
+        }
+    });
+    var RightPage = React.createClass({
+        render(){
+            return (<div className="rightPage">
+                        <input className="btn btn-default" type="button" value="预览" onClick={this.props.preview}/>
+                        <Input ref="InputRef" changeA={this.props.changeA}/>
+                        <Data ref="DataRef" changeB={this.props.changeB}/>
+                        <input className="btn btn-default" type="button" onClick={this.props.addInfo} value="添加"/>
+                    </div>
+            );
+        }
+    });
+
+    var LeftPage = React.createClass({
+        render(){
+            return (<div className="LeftPage">
+                        {
+                            this.props.forms.map((form, index)=> {
+                                if (form === 0) {
+                                    return <InputDelete deleteFrom={this.props.deleteFrom} index={index}/>
+                                }
+                                else if (form === 1) {
+                                    return <DataDelete deleteFrom={this.props.deleteFrom} index={index}/>
+                                }
+                            })
+                        }
+                    </div>
+            );
+        }
+    });
+
+    var Page = React.createClass({
+        getInitialState(){
+            return {
+                forms: [],
+                a: false,
+                b: false,
+                flag: true
+            }
+        },
+        preview(){
+            this.setState({flag: !this.state.flag});
+        },
+        addInfo(){
+            let forms = this.state.forms;
+            if (this.state.a) {
+                forms.push(0);
+            }
+            if (this.state.b) {
+                forms.push(1);
+            }
+            this.setState({forms: forms});
+        },
+        changeA(){
+            this.setState({a: !this.state.a});
+        },
+        changeB(){
+            this.setState({b: !this.state.b});
+        },
+        deleteFrom(index){
+            this.setState(function () {
+                let forms = this.state.forms.splice(index, 1);
+                return forms;
+            })
+        },
+        render: function () {
+            if (this.state.flag) {
+                return (<div className="Page">
+                    <RightPage addInfo={this.addInfo} changeA={this.changeA} changeB={this.changeB} preview={this.preview}/>
+                    <LeftPage forms={this.state.forms} deleteFrom={this.deleteFrom} />
+                </div>);
+            }
+            else {
+                return (<div className="pagePreview">
+                    <input className="btn btn-default" type="button" value="编辑" onClick={this.preview}/>
+                    <PreviewInput forms={this.state.forms} />
+                    <input className="btn btn-default submit" type="button" value="提交" />
+                </div>);
+
+            }
+        }
+    });
+    ReactDOM.render(<Page/>, document.getElementById('container'));
+</script>
+</body>
+</html>
