@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>React Tutorial</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.0/react-dom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -13,8 +14,93 @@
 
 <div id="content"></div>
 <script type="text/babel">
+    const App = React.createClass({
+        getInitialState: function () {
+            return {
+                isEditor: true,
+                element: []
+            }
+        },
+        addElement: function (element) {
+            const elements = this.state.element;
+            elements.push(element);
+            this.setState({element: elements});
+        },
+        deleteElement: function (index) {
+            const elements = this.state.element;
+            elements.splice(index, 1);
+            this.setState({element: elements});
+        },
+        toggle: function () {
+            this.setState({isEditor: !this.state.isEditor});
+        },
+        render: function () {
+            const isEditor = this.state.isEditor;
+            return (
+                    <div>
+                        <button onClick={this.toggle}>{isEditor ? 'Preview' : 'Editor'}</button>
+                        <div className={isEditor ? '' : 'hidden'}>
+                            <Editor onAdd={this.addElement} onDelete={this.deleteElement} element={this.state.element}/>
+                        </div>
+                        <div className={isEditor ? 'hidden' : ''}>
+                            <Previewer element={this.state.element}/>
+                        </div>
+                    </div>
+            );
+        }
+    });
+    const Editor = React.createClass({
+        render: function () {
+            return <div>
+                <Left onDelete={this.props.onDelete} element={this.props.element}/>
+                <Right onAdd={this.props.onAdd}/>
+            </div>
+        }
+    });
+    const Left = React.createClass({
+        remove: function (index) {
+            this.props.onDelete(index);
+        },
+        render: function () {
+            const element = this.props.element.map((ele, index)=> {
+                return (
+                        <div key={index}>
+                            <input type={ele}/>
+                            <input type="button" value="删除" onClick={this.remove.bind(this, index)}/>
+                        </div>
+                );
+            });
+            return <div>{element}</div>;
+        }
+    });
+    const Right = React.createClass({
+        add: function () {
+            const element = $('input[name=element]:checked').val();
+            this.props.onAdd(element);
+        },
+        render: function () {
+            return (<div>
+                        <input type="radio" name="element" value="text"/>text
+                        <input type="radio" name="element" value="date"/>data
+                        <input type="button" value="+" onClick={this.add}/>
+                    </div>
+            );
+        }
+    });
 
+    const Previewer = React.createClass({
+        render: function () {
+            const elements= this.props.element.map((ele,index)=>{
+                return <div key={index}>
+                    <input type={ele}/>
+                </div>
+            });
+            return <div>{elements}
+                    <input type="button" value="submit"/>
+            </div>
+        }
+    });
+    ReactDOM.render(<App/>, document.getElementById('content'));
 </script>
-
 </body>
 </html>
